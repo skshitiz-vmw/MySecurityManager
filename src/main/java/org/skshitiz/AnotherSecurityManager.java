@@ -3,6 +3,8 @@ package org.skshitiz;
 import org.apache.geode.security.AuthenticationFailedException;
 import org.apache.geode.security.ResourcePermission;
 import org.apache.geode.security.SecurityManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.geode.logging.internal.log4j.api.LogService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +14,9 @@ import java.util.Properties;
 public class AnotherSecurityManager implements SecurityManager {
 
     private final HashMap<String, User> approvedUsersList = new HashMap<>();
+  
+    static final Logger logger = LogService.getLogger();
+
 
     @Override
     public void init(final Properties securityProperties) {
@@ -45,14 +50,19 @@ public class AnotherSecurityManager implements SecurityManager {
 
     @Override
     public Object authenticate(Properties credentials) throws AuthenticationFailedException {
+        logger.info("Properties: {}, approvedUsersList: {}",credentials, approvedUsersList);
         String tokenPassedIn = credentials.getProperty(TOKEN);
+        logger.info(":DEBUG: Extracted {} using {} from properties.", tokenPassedIn, TOKEN);
         User authenticatedUser = this.approvedUsersList.get(tokenPassedIn);
         if (authenticatedUser == null) {
-            throw new AuthenticationFailedException("Invalid token");
+            logger.error("Authenticated User Found NULL, {}, {}", tokenPassedIn, approvedUsersList);
+            throw new AuthenticationFailedException("Invalid token, found user null");
         }
         if (!authenticatedUser.getUserToken().endsWith(authenticatedUser.toString())) {
-            throw new AuthenticationFailedException("Invalid token!");
+            logger.error("Authenticated Invalid Token, {}, {}", tokenPassedIn, approvedUsersList);
+            throw new AuthenticationFailedException("Sorry, Passed token is invalid or expired!");
         }
+        logger.info("Login successful");
         return authenticatedUser;
     }
 

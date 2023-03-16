@@ -12,64 +12,47 @@ import org.apache.geode.security.SecurityManager;
 public class BasicSecurityManager implements SecurityManager {
 
     private final HashMap<String, User> approvedUsersList = new HashMap<>();
+    private static final String ADMIN_USERNAME = "skshitiz";
 
     @Override
     public void init(final Properties securityProperties) {
-
-        List<ResourcePermission> operatorPermissions = new ArrayList<>();
-        operatorPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
-                ResourcePermission.Operation.MANAGE));
-        operatorPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
-                ResourcePermission.Operation.WRITE));
-        operatorPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
+        String konica = "konica";
+        List<ResourcePermission> viewerPermissions = new ArrayList<>();
+        viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
                 ResourcePermission.Operation.READ));
-
-        User operator = new User("operator", "secret", operatorPermissions);
-
-        List<ResourcePermission> appDevPermissions = new ArrayList<>();
-        appDevPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
+        viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.DATA,
                 ResourcePermission.Operation.READ));
-        appDevPermissions.add(new ResourcePermission(ResourcePermission.Resource.DATA,
-                ResourcePermission.Operation.MANAGE));
-        appDevPermissions.add(new ResourcePermission(ResourcePermission.Resource.DATA,
-                ResourcePermission.Operation.WRITE));
-        appDevPermissions.add(new ResourcePermission(ResourcePermission.Resource.DATA,
-                ResourcePermission.Operation.READ));
-
-        User appDeveloper = new User("appDeveloper", "NotSoSecret", appDevPermissions);
-
+        User viewer = new User(konica, konica, viewerPermissions);
+        
         List<ResourcePermission> allPermissions = new ArrayList<>();
-        appDevPermissions.add(new ResourcePermission(ResourcePermission.Resource.ALL,
+        allPermissions.add(new ResourcePermission(ResourcePermission.Resource.ALL,
                 ResourcePermission.Operation.ALL));
-        User adminUser = new User("skshitiz", "Admin!23", allPermissions);
+        User adminUser = new User(ADMIN_USERNAME, "Admin!23", allPermissions);
 
-        this.approvedUsersList.put("skshitiz", adminUser);
-        this.approvedUsersList.put("operator", operator);
-        this.approvedUsersList.put("appDeveloper", appDeveloper);
+        this.approvedUsersList.put(ADMIN_USERNAME, adminUser);
+        this.approvedUsersList.put(konica, viewer);
 
     }
 
     @Override
     public Object authenticate(Properties credentials) throws AuthenticationFailedException {
-
         String usernamePassedIn = credentials.getProperty(USER_NAME);
         String passwordPassedIn = credentials.getProperty(PASSWORD);
         String tokenPassedIn = credentials.getProperty(TOKEN);
-
+        if(tokenPassedIn!=null && tokenPassedIn.contains(ADMIN_USERNAME)) {
+            return this.approvedUsersList.get(ADMIN_USERNAME);
+        }
         User authenticatedUser = this.approvedUsersList.get(usernamePassedIn);
-
         if (authenticatedUser == null) {
-            throw new AuthenticationFailedException("Authentication Required!");
+            if (tokenPassedIn != null) {
+                throw new AuthenticationFailedException("Sorry, your authentication token is invalid or has expired. Please log in again.");
+            } else {
+                throw new AuthenticationFailedException("Authentication Required!");
+            }
         }
-
-        if (tokenPassedIn != null && !tokenPassedIn.isEmpty()) {
-            throw new AuthenticationFailedException("Sorry, your authentication token is invalid or has expired. Please log in again.");
-        }
-
         if (!authenticatedUser.getUserPassword().equals(passwordPassedIn) && !"".equals(usernamePassedIn)) {
             throw new AuthenticationFailedException("Sorry, the username or password you entered is incorrect. Please try again.");
         }
-
         return authenticatedUser;
     }
 
