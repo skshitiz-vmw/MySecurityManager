@@ -12,17 +12,17 @@ import org.apache.geode.security.SecurityManager;
 public class BasicSecurityManager implements SecurityManager {
 
     private final HashMap<String, User> approvedUsersList = new HashMap<>();
-    private static final String ADMIN_USERNAME = "skshitiz";
+    private static final String ADMIN_USERNAME = "admin";
 
     @Override
     public void init(final Properties securityProperties) {
-        String konica = "konica";
+        String viewer = "viewer";
         List<ResourcePermission> viewerPermissions = new ArrayList<>();
         viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
                 ResourcePermission.Operation.READ));
         viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.DATA,
                 ResourcePermission.Operation.READ));
-        User viewer = new User(konica, konica, viewerPermissions);
+        User viewerUser = new User(viewer, viewer, viewerPermissions);
         
         List<ResourcePermission> allPermissions = new ArrayList<>();
         allPermissions.add(new ResourcePermission(ResourcePermission.Resource.ALL,
@@ -30,7 +30,7 @@ public class BasicSecurityManager implements SecurityManager {
         User adminUser = new User(ADMIN_USERNAME, "Admin!23", allPermissions);
 
         this.approvedUsersList.put(ADMIN_USERNAME, adminUser);
-        this.approvedUsersList.put(konica, viewer);
+        this.approvedUsersList.put(viewer, viewerUser);
 
     }
 
