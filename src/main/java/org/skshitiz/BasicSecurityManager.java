@@ -68,11 +68,12 @@ public class BasicSecurityManager implements SecurityManager {
             User user = this.approvedUsersList.get(User.prefixOfToken.concat(principal.toString()));
             if (user == null) {
                 permitted = false;
-            }
-            for (ResourcePermission userPermission : user.getPermissions()) {
-                if (userPermission.implies(resourcePermissionRequested)) {
-                    permitted = true;
-                    break;
+            } else {
+                for (ResourcePermission userPermission : user.getPermissions()) {
+                    if (userPermission.implies(resourcePermissionRequested)) {
+                        permitted = true;
+                        break;
+                    }
                 }
             }
         }
