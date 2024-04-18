@@ -72,7 +72,7 @@ public class AnotherSecurityManager implements SecurityManager {
         if (principal == null) {
             permitted = false;
         } else {
-            User user = this.approvedUsersList.get(User.prefixOfToken.concat(principal.toString()));
+            User user = this.approvedUsersList.get(principal.toString());
             if (user == null) {
                 permitted = false;
             } else {
@@ -90,7 +90,7 @@ public class AnotherSecurityManager implements SecurityManager {
 
     private void auditAuthorizationLog(Object principal, ResourcePermission userPermission, boolean permitted) {
         logger.info("******** Start auditAuthorizationLog ********");
-        logger.info("AUDIT TRAIL: Principal - " + principal != null ? principal.toString() : "null" + " Permitted: " + permitted + " to " + userPermission + "." );
+        logger.info("AUDIT TRAIL: Principal - " + (principal != null ? principal.toString() : "null") + " Permitted: " + permitted + " to " + userPermission + "." );
         logger.info("******** End auditAuthorizationLog ********");
     }
 

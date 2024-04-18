@@ -21,10 +21,10 @@ public class BasicSecurityManager implements SecurityManager {
     public void init(final Properties securityProperties) {
         String viewer = "viewer";
         List<ResourcePermission> viewerPermissions = new ArrayList<>();
-       viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
-               ResourcePermission.Operation.READ));
-       viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.DATA,
-               ResourcePermission.Operation.READ));
+        viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.CLUSTER,
+            ResourcePermission.Operation.READ));
+        viewerPermissions.add(new ResourcePermission(ResourcePermission.Resource.DATA,
+            ResourcePermission.Operation.READ));
         User viewerUser = new User(viewer, viewer, viewerPermissions);
         
         List<ResourcePermission> allPermissions = new ArrayList<>();
@@ -34,7 +34,6 @@ public class BasicSecurityManager implements SecurityManager {
         logger.info("Adding Users: {}: {}, {}, {}", ADMIN_USERNAME, allPermissions, viewer, viewerPermissions);
         this.approvedUsersList.put(ADMIN_USERNAME, adminUser);
         this.approvedUsersList.put(viewer, viewerUser);
-
     }
 
     @Override
@@ -65,7 +64,7 @@ public class BasicSecurityManager implements SecurityManager {
         if (principal == null) {
             permitted = false;
         } else {
-            User user = this.approvedUsersList.get(User.prefixOfToken.concat(principal.toString()));
+            User user = this.approvedUsersList.get(principal.toString());
             if (user == null) {
                 permitted = false;
             } else {
@@ -83,7 +82,7 @@ public class BasicSecurityManager implements SecurityManager {
 
     private void auditAuthorizationLog(Object principal, ResourcePermission userPermission, boolean permitted) {
         logger.info("******** Start auditAuthorizationLog ********");
-        logger.info("AUDIT TRAIL: Principal - " + principal != null ? principal.toString() : "null" + " Permitted: " + permitted + " to " + userPermission + "." );
+        logger.info("AUDIT TRAIL: Principal - " + (principal != null ? principal.toString() : "null") + " Permitted: " + permitted + " to " + userPermission + "." );
         logger.info("******** End auditAuthorizationLog ********");
     }
 }

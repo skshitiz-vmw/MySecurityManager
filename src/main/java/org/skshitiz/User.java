@@ -7,7 +7,6 @@ import org.apache.geode.security.ResourcePermission;
 
 public class User implements Serializable {
 
-    static final String prefixOfToken = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-";
     private List<ResourcePermission> userPermissions;
     private String userName;
     private String userPassword;
@@ -17,7 +16,6 @@ public class User implements Serializable {
         this.userName = userName;
         this.userPassword = userPassword;
         this.userPermissions = userPermissions;
-        this.userToken = prefixOfToken.concat(userName);
     }
 
     public String getUserPassword() {
