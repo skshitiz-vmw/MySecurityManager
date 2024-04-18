@@ -31,7 +31,7 @@ public class BasicSecurityManager implements SecurityManager {
         allPermissions.add(new ResourcePermission(ResourcePermission.Resource.ALL,
                 ResourcePermission.Operation.ALL));
         User adminUser = new User(ADMIN_USERNAME, "Admin!23", allPermissions);
-
+        logger.info("Adding Users: {}: {}, {}, {}", ADMIN_USERNAME, allPermissions, viewer, viewerPermissions);
         this.approvedUsersList.put(ADMIN_USERNAME, adminUser);
         this.approvedUsersList.put(viewer, viewerUser);
 
