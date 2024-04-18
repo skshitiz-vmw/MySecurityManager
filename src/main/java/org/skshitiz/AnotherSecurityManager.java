@@ -68,19 +68,29 @@ public class AnotherSecurityManager implements SecurityManager {
 
     @Override
     public boolean authorize(Object principal, ResourcePermission resourcePermissionRequested) {
+        boolean permitted = false;
         if (principal == null) {
-            return false;
-        }
-        User user = this.approvedUsersList.get(User.prefixOfToken.concat(principal.toString()));
-        if (user == null) {
-            return false;
-        }
-        for (ResourcePermission userPermission : user.getPermissions()) {
-            if (userPermission.implies(resourcePermissionRequested)) {
-                return true;
+            permitted = false;
+        } else {
+            User user = this.approvedUsersList.get(User.prefixOfToken.concat(principal.toString()));
+            if (user == null) {
+                permitted = false;
+            }
+            for (ResourcePermission userPermission : user.getPermissions()) {
+                if (userPermission.implies(resourcePermissionRequested)) {
+                    permitted = true;
+                    break;
+                }
             }
         }
-        return false;
+        auditAuthorizationLog(principal, resourcePermissionRequested, permitted);
+        return permitted;
+    }
+
+    private void auditAuthorizationLog(Object principal, ResourcePermission userPermission, boolean permitted) {
+        logger.info("******** Start auditAuthorizationLog ********");
+        logger.info("AUDIT TRAIL: Principal - " + principal != null ? principal.toString() : "null" + " Permitted: " + permitted + " to " + userPermission + "." );
+        logger.info("******** End auditAuthorizationLog ********");
     }
 
 }
