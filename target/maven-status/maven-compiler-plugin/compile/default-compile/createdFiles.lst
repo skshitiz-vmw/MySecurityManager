@@ -1,3 +1,4 @@
 org/skshitiz/BasicSecurityManager.class
+org/skshitiz/CustomAuthorizer.class
 org/skshitiz/AnotherSecurityManager.class
 org/skshitiz/User.class
